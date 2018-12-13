@@ -1,6 +1,7 @@
 import argparse
 
 import torch
+import torchvision.utils as vutils
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -10,6 +11,7 @@ from dcgan import Generator
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-load_path', default='model/model_final.pth', help='Checkpoint to load path from')
+parser.add_argument('-num_output', default=64, help='Number of generated outputs')
 args = parser.parse_args()
 
 # Load the checkpoint file.
@@ -26,8 +28,9 @@ netG = Generator(params).to(device)
 netG.load_state_dict(state_dict['generator'])
 print(netG)
 
+print(args.num_output)
 # Get latent vector Z from unit normal distribution.
-noise = torch.randn(1, params['nz'], 1, 1, device=device)
+noise = torch.randn(int(args.num_output), params['nz'], 1, 1, device=device)
 
 # Turn off gradient calculation to speed up the process.
 with torch.no_grad():
@@ -36,6 +39,8 @@ with torch.no_grad():
     generated_img = netG(noise).detach().cpu()
 
 # Display the generated image.
+plt.axis("off")
 plt.title("Generated Images")
-plt.imshow(np.transpose(generated_img[-1], (1,2,0)))
+plt.imshow(np.transpose(vutils.make_grid(generated_img, padding=2, normalize=True), (1,2,0)))
+
 plt.show()
