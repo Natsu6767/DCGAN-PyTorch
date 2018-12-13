@@ -59,7 +59,7 @@ By default, GPU is used for training if available.
 <p align="center">
 <img src="images/Training_Loss.png" title="Training Loss Curves" alt="Training Loss Curves">
 </p>
-*D: Discriminator, G: Generator*
+<i>D: Discriminator, G: Generator</i>
 
 ## Generating New Images
 To generate new unseen images, run **`generate.py`**.
