@@ -1,11 +1,11 @@
 # Deep Convolutional GAN
 
+PyTorch implementation of DCGAN introduced in the paper: [Unsupervised Representation Learning with Deep Convolutional 
+Generative Adversarial Networks](https://arxiv.org/abs/1511.06434), Alec Radford, Luke Metz, Soumith Chintala.
+
 <p align="center">
 <img src="gen_celeba.gif" title="Generated Data Animation" alt="Generated Data Animation">
 </p>
-
-PyTorch implementation of DCGAN introduced in the paper: [Unsupervised Representation Learning with Deep Convolutional 
-Generative Adversarial Networks](https://arxiv.org/abs/1511.06434), Alec Radford, Luke Metz, Soumith Chintala.
 
 ## Introduction
 Generative Adversarial Networks (GANs) are one of the most popular (and coolest)
