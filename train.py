@@ -24,7 +24,8 @@ params = {
     'ndf' : 64,
     'nepochs' : 5,
     'lr' : 0.0002,
-    'beta1' : 0.5}
+    'beta1' : 0.5,
+    'save_epoch' : 2}
 
 device = torch.device("cuda:0" if(torch.cuda.is_available()) else "cpu")
 
@@ -139,6 +140,19 @@ for epochs in range(params['nepochs']):
             img_list.append(vutils.make_grid(fake_data, padding=2, normalize=True))
 
         iter += 1
+
+    if epoch % params['save_epoch'] == 0:
+    	torch.save({
+    		'generator' : netG.state_dict(),
+    		'discriminator' : netD.state_dict(),
+    		'optimizer' : optimizer.state_dict()
+    		}, 'model/model_epoch_{}.pth'.format(epoch))
+
+torch.save({
+    		'generator' : netG.state_dict(),
+    		'discriminator' : netD.state_dict(),
+    		'optimizer' : optimizer.state_dict()
+    		}, 'model/model_final.pth')
 
 # Plot the training losses.
 plt.figure(figsize=(10,5))
