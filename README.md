@@ -53,6 +53,8 @@ To train the model, run **`train.py`**. To set the training parametrs, update th
 Checkpoints would be saved by default in model directory every 2 epochs. 
 By default, GPU is used for training if available.
 
+*Training will take a long time. It took me around 3 hours on a NVIDIA GeForce GTX 1060 GPU. Using a CPU is not recommended.*
+
 **Loss Curves**
 <p align="center">
 <img src="images/Training_Loss.png" title="Training Loss Curves" alt="Training Loss Curves">
