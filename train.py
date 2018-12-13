@@ -122,4 +122,20 @@ for epochs in range(params['nepochs']):
 		# Update generator parameters.
 		optimizerG.step()
 
-		
+		# Check progress of training.
+		if i%100 == 0:
+			print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
+                  % (epoch, params['nepochs'], i, len(dataloader),
+                     errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
+
+		# Save the losses for plotting.
+		G_losses.append(errG.item())
+		D_losses.append(errD.item())
+
+		# Check how the generator is doing by saving G's output on a fixed noise.
+		if (iters % 500 == 0) or ((epoch == params['nepochs']-1) and (i == len(dataloader)-1)):
+            with torch.no_grad():
+                fake_data = netG(fixed_noise).detach().cpu()
+            img_list.append(vutils.make_grid(fake_data, padding=2, normalize=True))
+
+        iter += 1
