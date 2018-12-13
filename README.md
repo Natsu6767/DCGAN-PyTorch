@@ -18,7 +18,12 @@ DCGAN is one of the most popular and succesful network design for GAN. It mainly
 without max pooling or fully connected layers. It uses strided convolutions and transposed convolutions 
 for the downsampling and the upsampling respectively.
 
-Network Design of DCGAN:
+**Generator architecture of DCGAN**
+<p align="center">
+<img src="images/Generator.png" title="DCGAN Generator" alt="DCGAN Generator">
+</p>
+
+**Network Design of DCGAN:**
 * Replace all pooling layers with strided convolutions.
 * Remove all fully connected layers.
 * Use transposed convolutions for upsampling.
