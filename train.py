@@ -10,28 +10,33 @@ import random
 from utils import get_celeba
 from dcgan import weights_init, Generator, Discriminator
 
+# Set random seed for reproducibility.
 seed = 369
 random.seed(seed)
 torch.manual_seed(seed)
 print("Random Seed: ", seed)
 
+# Parameters to define the model.
 params = {
-    "bsize" : 128,
-    'imsize' : 64,
-    'nc' : 3,
-    'nz' : 100,
-    'ngf' : 64,
-    'ndf' : 64,
-    'nepochs' : 1,
-    'lr' : 0.0002,
-    'beta1' : 0.5,
-    'save_epoch' : 2}
+    "bsize" : 128,# Batch size during training.
+    'imsize' : 64,# Spatial size of training images. All images will be resized to this size during preprocessing.
+    'nc' : 3,# Number of channles in the training images. For coloured images this is 3.
+    'nz' : 100,# Size of the Z latent vector (the input to the generator).
+    'ngf' : 64,# Size of feature maps in the generator. The depth will be multiples of this.
+    'ndf' : 64, # Size of features maps in the discriminator. The depth will be multiples of this.
+    'nepochs' : 1,# Number of training epochs.
+    'lr' : 0.0002,# Learning rate for optimizers
+    'beta1' : 0.5,# Beta1 hyperparam for Adam optimizer
+    'save_epoch' : 2}# Save step.
 
+# Use GPU is available else use CPU.
 device = torch.device("cuda:0" if(torch.cuda.is_available()) else "cpu")
-print(device)
+print(device, " will be used.\n")
 
+# Get the data.
 dataloader = get_celeba(params)
 
+# Plot the training images.
 sample_batch = next(iter(dataloader))
 plt.figure(figsize=(8, 8))
 plt.axis("off")
@@ -41,14 +46,23 @@ plt.imshow(np.transpose(vutils.make_grid(
 
 plt.show()
 
+# Create the generator.
 netG = Generator(params).to(device)
+# Apply the weights_init() function to randomly initialize all
+# weights to mean=0.0, stddev=0.2
 netG.apply(weights_init)
+# Print the model.
 print(netG)
 
+# Create the discriminator.
 netD = Discriminator(params).to(device)
+# Apply the weights_init() function to randomly initialize all
+# weights to mean=0.0, stddev=0.2
 netD.apply(weights_init)
+# Print the model.
 print(netD)
 
+# Binary Cross Entropy loss function.
 criterion = nn.BCELoss()
 
 fixed_noise = torch.randn(64, params['nz'], 1, 1, device=device)
@@ -56,15 +70,22 @@ fixed_noise = torch.randn(64, params['nz'], 1, 1, device=device)
 real_label = 1
 fake_label = 0
 
+# Optimizer for the discriminator.
 optimizerD = optim.Adam(netD.parameters(), lr=params['lr'], betas=(params['beta1'], 0.999))
+# Optimizer for the generator.
 optimizerG = optim.Adam(netG.parameters(), lr=params['lr'], betas=(params['beta1'], 0.999))
 
+# Stores generated images as training progresses.
 img_list = []
+# Stores generator losses during training.
 G_losses = []
+# Stores discriminator losses during training.
 D_losses = []
+
 iters = 0
 
 print("Starting Training Loop...")
+print("-"*25)
 
 for epoch in range(params['nepochs']):
     for i, data in enumerate(dataloader, 0):
@@ -147,6 +168,7 @@ for epoch in range(params['nepochs']):
         if(iters == 500):
             break
 
+    # Save the model.
     if epoch % params['save_epoch'] == 0:
         torch.save({
             'generator' : netG.state_dict(),
@@ -156,6 +178,7 @@ for epoch in range(params['nepochs']):
             'params' : params
             }, 'model/model_epoch_{}.pth'.format(epoch))
 
+# Save the final trained model.
 torch.save({
             'generator' : netG.state_dict(),
             'discriminator' : netD.state_dict(),
@@ -178,5 +201,6 @@ plt.show()
 fig = plt.figure(figsize=(8,8))
 plt.axis("off")
 ims = [[plt.imshow(np.transpose(i,(1,2,0)), animated=True)] for i in img_list]
-ani = animation.ArtistAnimation(fig, ims, interval=1000, repeat_delay=1000, blit=True)
+anim = animation.ArtistAnimation(fig, ims, interval=1000, repeat_delay=1000, blit=True)
 plt.show()
+anim.save('celeba.gif', dpi=80, writer='imagemagick')
