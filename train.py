@@ -139,3 +139,12 @@ for epochs in range(params['nepochs']):
             img_list.append(vutils.make_grid(fake_data, padding=2, normalize=True))
 
         iter += 1
+
+plt.figure(figsize=(10,5))
+plt.title("Generator and Discriminator Loss During Training")
+plt.plot(G_losses,label="G")
+plt.plot(D_losses,label="D")
+plt.xlabel("iterations")
+plt.ylabel("Loss")
+plt.legend()
+plt.show()
