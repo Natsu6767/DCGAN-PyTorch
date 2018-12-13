@@ -14,30 +14,25 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-load_path', default='model/model_final.pth', help='Checkpoint to load path from')
 args = parser.parse_args()
 
-seed = 369
-random.seed(seed)
-torch.manual_seed(seed)
-print("Random Seed: ", seed)
+state_dict = torch.load(args.load_path)
 
 device = torch.device("cuda:0" if(torch.cuda.is_available()) else "cpu")
+params = state_dict['params']
 
 dataloader = get_celeba(params)
-
-state_dict = torch.load(args.load_path)
 
 netG = Generator(params).to(device)
 netG.load_state_dict(state_dict['generator'])
 print(netG)
 
-params = state_dict['params']
-noise = torch.randn(1, params['nz'], 1, 1)
+noise = torch.randn(1, params['nz'], 1, 1, device=device)
 
 with torch.no_grad():
     generated_img = netG(noise).detach().cpu()
 
+print(generated_img.shape)
+
 # Plot the fake image.
-plt.subplot(1,2,2)
-plt.axis("off")
 plt.title("Generated Images")
-plt.imshow(generated_img)
+plt.imshow(np.transpose(generated_img[-1], (1,2,0)))
 plt.show()

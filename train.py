@@ -22,12 +22,13 @@ params = {
     'nz' : 100,
     'ngf' : 64,
     'ndf' : 64,
-    'nepochs' : 5,
+    'nepochs' : 1,
     'lr' : 0.0002,
     'beta1' : 0.5,
     'save_epoch' : 2}
 
 device = torch.device("cuda:0" if(torch.cuda.is_available()) else "cpu")
+print(device)
 
 dataloader = get_celeba(params)
 
@@ -63,96 +64,105 @@ G_losses = []
 D_losses = []
 iters = 0
 
-for epochs in range(params['nepochs']):
-	for i, data in enumerate(dataloader, 0):
-		# Transfer data tensor to GPU/CPU (device)
-		real_data = data.to(device)
-		# Get batch size. Can be different from params['nbsize'] for last batch in epoch.
-		b_size = real_data.size(0)
+print("Starting Training Loop...")
+
+for epoch in range(params['nepochs']):
+    for i, data in enumerate(dataloader, 0):
+        # Transfer data tensor to GPU/CPU (device)
+        real_data = data[0].to(device)
+        # Get batch size. Can be different from params['nbsize'] for last batch in epoch.
+        b_size = real_data.size(0)
         
         # Make accumalated gradients of the discriminator zero.
-		netD.zero_grad()
-		# Create labels for the real data. (label=1)
-		label = torch.full((b_size, ), real_label, device=device)
-		output = netD(real_data).view(-1)
-		errD_real = criterion(output, label)
-		# Calculate gradients for backpropagation.
-		errD_real.backward()
-		D_x = output.mean().item()
+        netD.zero_grad()
+        # Create labels for the real data. (label=1)
+        label = torch.full((b_size, ), real_label, device=device)
+        output = netD(real_data).view(-1)
+        errD_real = criterion(output, label)
+        # Calculate gradients for backpropagation.
+        errD_real.backward()
+        D_x = output.mean().item()
         
         # Sample random data from a unit normal distribution.
-		noise = torch.randn(b_size, params['nz'], 1, 1, device=device)
-		# Generate fake data (images).
-		fake_data = netG(noise)
-		# Create labels for fake data. (label=0)
-		label.fill(fake_data)
-		# Calculate the output of the discriminator of the fake data.
-		# As no gradients w.r.t. the generator parameters are to be
-		# calculated, detach() is used. Hence, only gradients w.r.t. the
-		# discriminator parameters will be calculated.
-		# This is done because the loss functions for the discriminator
-		# and the generator are slightly different.
-		output = netD(fake_data.detach()).view(-1)
-		errD_fake = criterion(output, label)
-		# Calculate gradients for backpropagation.
-		errD_fake.backward()
-		D_G_z1 = output.mean().item()
+        noise = torch.randn(b_size, params['nz'], 1, 1, device=device)
+        # Generate fake data (images).
+        fake_data = netG(noise)
+        # Create labels for fake data. (label=0)
+        label.fill_(fake_label  )
+        # Calculate the output of the discriminator of the fake data.
+        # As no gradients w.r.t. the generator parameters are to be
+        # calculated, detach() is used. Hence, only gradients w.r.t. the
+        # discriminator parameters will be calculated.
+        # This is done because the loss functions for the discriminator
+        # and the generator are slightly different.
+        output = netD(fake_data.detach()).view(-1)
+        errD_fake = criterion(output, label)
+        # Calculate gradients for backpropagation.
+        errD_fake.backward()
+        D_G_z1 = output.mean().item()
 
-		# Net discriminator loss.
-		errD = errD_real + errD_fake
-		# Update discriminator parameters.
-		optimizerD.step()
+        # Net discriminator loss.
+        errD = errD_real + errD_fake
+        # Update discriminator parameters.
+        optimizerD.step()
         
         # Make accumalted gradients of the generator zero.
-		netG.zero_grad()
-		# We want the fake data to be classified as real. Hence
-		# real_label are used. (label=1)
-		label.fill(real_label)
-		# No detach() is used here as we want to calculate the gradients w.r.t.
-		# the generator this time.
-		output = netD(fake_data).view(-1)
-		errG = criterion(label, output)
-		# Gradients for backpropagation are calculated.
-		# Gradients w.r.t. both the generator and the discriminator
-		# parameters are calculated, however, the generator's optimizer
-		# will only update the parameters of the generator. The discriminator
-		# gradients will be set to zero in the next iteration by netD.zero_grad()
-		errG.backward()
+        netG.zero_grad()
+        # We want the fake data to be classified as real. Hence
+        # real_label are used. (label=1)
+        label.fill_(real_label)
+        # No detach() is used here as we want to calculate the gradients w.r.t.
+        # the generator this time.
+        output = netD(fake_data).view(-1)
+        errG = criterion(output, label)
+        # Gradients for backpropagation are calculated.
+        # Gradients w.r.t. both the generator and the discriminator
+        # parameters are calculated, however, the generator's optimizer
+        # will only update the parameters of the generator. The discriminator
+        # gradients will be set to zero in the next iteration by netD.zero_grad()
+        errG.backward()
 
-		D_G_z2 = output.mean().item()
-		# Update generator parameters.
-		optimizerG.step()
+        D_G_z2 = output.mean().item()
+        # Update generator parameters.
+        optimizerG.step()
 
-		# Check progress of training.
-		if i%100 == 0:
-			print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
+        # Check progress of training.
+        if i%50 == 0:
+            print(torch.cuda.is_available())
+            print('[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                   % (epoch, params['nepochs'], i, len(dataloader),
                      errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))
 
-		# Save the losses for plotting.
-		G_losses.append(errG.item())
-		D_losses.append(errD.item())
+        # Save the losses for plotting.
+        G_losses.append(errG.item())
+        D_losses.append(errD.item())
 
-		# Check how the generator is doing by saving G's output on a fixed noise.
-		if (iters % 500 == 0) or ((epoch == params['nepochs']-1) and (i == len(dataloader)-1)):
+        # Check how the generator is doing by saving G's output on a fixed noise.
+        if (iters % 100 == 0) or ((epoch == params['nepochs']-1) and (i == len(dataloader)-1)):
             with torch.no_grad():
                 fake_data = netG(fixed_noise).detach().cpu()
             img_list.append(vutils.make_grid(fake_data, padding=2, normalize=True))
 
-        iter += 1
+        iters += 1
+        if(iters == 500):
+            break
 
     if epoch % params['save_epoch'] == 0:
-    	torch.save({
-    		'generator' : netG.state_dict(),
-    		'discriminator' : netD.state_dict(),
-    		'optimizer' : optimizer.state_dict()
-    		}, 'model/model_epoch_{}.pth'.format(epoch))
+        torch.save({
+            'generator' : netG.state_dict(),
+            'discriminator' : netD.state_dict(),
+            'optimizerG' : optimizerG.state_dict(),
+            'optimizerD' : optimizerD.state_dict(),
+            'params' : params
+            }, 'model/model_epoch_{}.pth'.format(epoch))
 
 torch.save({
-    		'generator' : netG.state_dict(),
-    		'discriminator' : netD.state_dict(),
-    		'optimizer' : optimizer.state_dict()
-    		}, 'model/model_final.pth')
+            'generator' : netG.state_dict(),
+            'discriminator' : netD.state_dict(),
+            'optimizerG' : optimizerG.state_dict(),
+            'optimizerD' : optimizerD.state_dict(),
+            'params' : params
+            }, 'model/model_final.pth')
 
 # Plot the training losses.
 plt.figure(figsize=(10,5))
