@@ -1,0 +1,21 @@
+{
+  "model_type": "specgan",
+  "checkpoint": "D:\\Project_Github\\DCGAN-PyTorch\\wavegan\\train_click_specgan_torch_gpu\\specgan_epoch_0200.pt",
+  "checkpoint_epoch": 200,
+  "sample_rate_hz": 576000,
+  "real_sample_count": 18418,
+  "generated_sample_count": 18418,
+  "griffin_lim_iterations": 16,
+  "feature_wasserstein_distance": {
+    "peak_amplitude": 0.18583349499255594,
+    "peak_to_peak": 0.2227725406522303,
+    "rms": 0.007898767489180631,
+    "peak_location_samples": 0.6257465522858079,
+    "fwhm_samples": 0.0476433950418601,
+    "dominant_frequency_hz": 3576.93560647193,
+    "spectral_centroid_hz": 782.7406275934995,
+    "spectral_bandwidth_hz": 5264.804662341368
+  },
+  "mean_psd_absolute_error": 0.00539756566286087,
+  "mean_log10_psd_absolute_error": 0.3736012279987335
+}

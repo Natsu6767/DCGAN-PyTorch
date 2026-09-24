@@ -1,0 +1,26 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+
+# 虚拟环境
+.venv/
+venv/
+
+# 数据集与训练生成物
+data/
+
+celeba.gif
+*.pt
+*.log
+*.sh
+*.pyc
+*.ipynb_checkpoints
+*.wav
+*.tar.gz
+wavegan/train_click/*
+wavegan/log/*
+wavegan/images/
+wavegan_improve/images/
+wavegan_improve/log
+# 新训练的模型检查点
+model/

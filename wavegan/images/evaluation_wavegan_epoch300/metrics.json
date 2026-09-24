@@ -1,0 +1,35 @@
+{
+  "checkpoint": "D:\\Project_Github\\DCGAN-PyTorch\\wavegan\\train_click_wavegan_epoch300\\wavegan_epoch_0300.pt",
+  "checkpoint_epoch": 300,
+  "sample_rate_hz": 576000,
+  "real_sample_count": 18418,
+  "generated_sample_count": 18418,
+  "feature_wasserstein_distance": {
+    "peak_amplitude": 0.06961531146271814,
+    "peak_to_peak": 0.06968870403511875,
+    "rms": 0.0021571235617774236,
+    "peak_location_samples": 0.7570854598762093,
+    "fwhm_samples": 0.2966368302730412,
+    "dominant_frequency_hz": 1316.9182321641886,
+    "spectral_centroid_hz": 673.3675422476276,
+    "spectral_bandwidth_hz": 398.9017393170351
+  },
+  "mean_psd_absolute_error": 0.0012446664040908217,
+  "mean_log10_psd_absolute_error": 0.1909419447183609,
+  "normalized_waveform_nearest_neighbor_l2": {
+    "normalization": "per_waveform_minmax_to_minus1_plus1",
+    "distance": "l2_over_128_samples",
+    "real_to_real_excluding_self": {
+      "mean_l2": 0.7473723292350769,
+      "std_l2": 0.41517090797424316
+    },
+    "generated_to_real": {
+      "mean_l2": 1.1262421607971191,
+      "std_l2": 0.4366650879383087
+    },
+    "real_to_generated": {
+      "mean_l2": 1.2054710388183594,
+      "std_l2": 0.5068222284317017
+    }
+  }
+}

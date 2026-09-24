@@ -1,0 +1,11 @@
+--extra-index-url https://download.pytorch.org/whl/cu126
+
+# CUDA-enabled PyTorch build for the NVIDIA driver installed on this computer.
+torch==2.7.0+cu126
+torchvision==0.22.0+cu126
+torchaudio==2.7.0+cu126
+
+# Waveform loading and visualization.
+numpy
+scipy
+matplotlib
